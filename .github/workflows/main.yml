@@ -30,7 +30,6 @@ jobs:
         with:
           node-version: '14.x'
       - run: npm install
-      - run: npm build
 
   deploy:
     #if: github.ref == 'refs/heads/master' || github.event.pull_request.base.ref == 'master' && github.event_name == 'pull_request'
@@ -52,7 +51,7 @@ jobs:
           -e "ssh -i ${{ env.ssh_key_path }} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" \
           ./ \
           ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ env.app_path }}
-      - name: Build and Start App
+      - name: Start Auth Server
         run: |
           ssh -i ${{ env.ssh_key_path }} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
           ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
@@ -60,4 +59,4 @@ jobs:
           && sudo chmod -R 777 /home/ubuntu/publishing-auth \
           && sudo npm install \
           && sudo npm install pm2 -g \
-          && pm2 startOrReload app.json'
+          && pm2 startOrReload app.json --env production'
