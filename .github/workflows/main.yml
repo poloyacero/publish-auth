@@ -2,11 +2,6 @@ name: Deploy to Publising Auth
  
 on:
   push:
-    branches:
-      - '*'
-  pull_request:
-    branches:
-      - '*'
 
 env:
   ssh_key_path: ~/.ssh/thepublishing.pem
