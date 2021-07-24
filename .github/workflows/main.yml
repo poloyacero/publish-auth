@@ -1,0 +1,64 @@
+name: Deploy to Publising Auth
+ 
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+env:
+  ssh_key_path: ~/.ssh/thepublishing.pem
+  app_path: /home/ubuntu/publishing-auth/
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache multiple paths
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.npm
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - run: npm install
+      - run: npm build
+
+  deploy:
+    #if: github.ref == 'refs/heads/master' || github.event.pull_request.base.ref == 'master' && github.event_name == 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Generate SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ${{ env.ssh_key_path }}
+          chmod 400 ${{ env.ssh_key_path }}
+          eval "$(ssh-agent -s)"
+          ssh-add ${{ env.ssh_key_path }}
+      - name: Deploy with "rsync" command
+        run: |
+          rsync -avL --progress --exclude ".git/" \
+          -e "ssh -i ${{ env.ssh_key_path }} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" \
+          ./ \
+          ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ env.app_path }}
+      - name: Build and Start App
+        run: |
+          ssh -i ${{ env.ssh_key_path }} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+          ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
+          'cd ${{ env.app_path }} \
+          && sudo chmod -R 777 /home/ubuntu/publishing-auth \
+          && sudo npm install \
+          && sudo npm install pm2 -g \
+          && sudo npm run build \
+          && pm2 startOrReload app.json --env production'
