@@ -1,0 +1,4 @@
+{
+    "name" : "auth",
+    "script" : "npm run start"
+  }
