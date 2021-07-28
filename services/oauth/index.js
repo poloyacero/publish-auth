@@ -105,6 +105,7 @@ module.exports = (options = {}) => {
           issuer
         });
       } catch (e) {
+        console.log('E:', e)
         throw new InvalidTokenError();
       }  
       if (type !== 'refreshToken') {
@@ -117,6 +118,7 @@ module.exports = (options = {}) => {
             throw new Error();
           }
         } catch (e) {
+          console.log('E1:', e)
           throw new InvalidClientError();
         }
       }  
