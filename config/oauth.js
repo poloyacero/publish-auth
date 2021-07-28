@@ -1,4 +1,5 @@
 const { access_token_secret, refresh_token_secret } = require('../config/config_key');
+console.log(refresh_token_secret)
 
 const OAuthServer = require('../services/oauth/oauth2server');
 const jwtMixin = require('../services/oauth/index');

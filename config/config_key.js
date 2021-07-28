@@ -15,6 +15,7 @@ const access_token_secret = fs.readFileSync(JWT_ACCESS_TOKEN_PRIVKEY, 'utf-8');
 const refresh_token_secret = fs.readFileSync(JWT_REFRESH_TOKEN_PRIVKEY, 'utf-8');
 const access_token_public = fs.readFileSync(JWT_ACCESS_TOKEN_PUBKEY, 'utf-8');
 const refresh_token_public = fs.readFileSync(JWT_REFRESH_TOKEN_PUBKEY, 'utf-8');
+console.log(refresh_token_secret)
 
 module.exports = {
   SERVER_PORT,
