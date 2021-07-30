@@ -100,6 +100,7 @@ module.exports = (options = {}) => {
     getRefreshToken: async (token) => {
       console.log('getRefreshToken');
       try {
+        console.log('getRefreshToken', refreshTokenSecret)
         var { exp, aud, type, scope, user } = await verifyAsync(token, refreshTokenSecret, {
           algorithms,
           issuer

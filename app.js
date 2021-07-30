@@ -4,7 +4,13 @@ const Boom = require('@hapi/boom');
 const cors = require('cors');
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  "origin": '*',
+  "methods": ['POST', 'GET', 'PUT', 'PATCH'],
+  "preflightContinue": false,
+  "optionsSuccessStatus": 200
+}));
+app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
