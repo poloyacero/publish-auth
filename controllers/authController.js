@@ -108,7 +108,7 @@ authController.forgotPassword = async (req, res, next) => {
   const { email } = req.body;
   try {
     const itIs = await isExist(AuthUser, { email: email });
-    const passcode = await randomPasscode(6);
+    const passcode = await randomPasscode();
 
     if(itIs) {
       await savePasscode(email, passcode);

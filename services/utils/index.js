@@ -52,14 +52,10 @@ const randomString = async (size = 21, type = 'base64') => {
   return cryptString
 }
 
-const randomPasscode = async (size = 6) => {
+const randomPasscode = async () => {
   const cryptString = await new Promise(async (resolve, reject) => {
     try {
-      randomInt(0, 1000000, (err, n) => {
-        if (err) throw err;
-        const verificationCode = n.toString().padStart(size, "0");
-        return resolve(verificationCode);
-      });
+      return resolve(Math.floor(100000 + Math.random() * 900000));
     }catch(error) {
       return reject(Boom.internal(
         error.message,
