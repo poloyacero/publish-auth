@@ -1,19 +1,18 @@
 const { isDev, isProd } = require('./config/config_key');
 const express = require('express');
 const Boom = require('@hapi/boom');
-const cors = require('cors');
 const app = express();
-
-app.use(cors({
-  "origin": '*',
-  "methods": ['POST', 'GET', 'PUT', 'PATCH'],
-  "preflightContinue": false,
-  "optionsSuccessStatus": 200
-}));
-app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//mongodb init
+const mongodb = require('./database/mongo');
+mongodb().then(() => {
+    console.log('MongoDB Connected');
+}).catch((e) => {
+    console.log('MongoDB Error:', e);
+});
 
 // exposed routes
 const authRoutes = require('./api/routes/auth');

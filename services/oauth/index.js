@@ -224,6 +224,7 @@ module.exports = (options = {}) => {
         return null;
 
       }catch(error) {
+        console.log(error)
         return null;
       }
     }

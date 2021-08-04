@@ -18,6 +18,34 @@ module.exports = {
         unique: true,
         allowNull: false
       },
+      business: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      business_name: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      address: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      city: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      state_province: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      phone: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      postal_code: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE
