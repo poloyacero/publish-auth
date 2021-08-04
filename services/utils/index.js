@@ -1,6 +1,6 @@
 const { MAGIC_ROUND, access_token_public } = require('../../config/config_key');
 const bcrypt = require('bcrypt');
-const crypto = require('crypto');
+const { randomInt, randomBytes } = require('crypto');
 const Boom = require('@hapi/boom');
 const jwt = require('jsonwebtoken');
 const Validator = require('validatorjs');
@@ -37,7 +37,7 @@ const hashPassword = async (password) => {
 const randomString = async (size = 21, type = 'base64') => {
   const cryptString = await new Promise(async (resolve, reject) => {
     try {
-      const crypted = await crypto.randomBytes(size)
+      const crypted = await randomBytes(size)
       .toString(type)
       .slice(0, size);
       return resolve(crypted);
@@ -52,10 +52,10 @@ const randomString = async (size = 21, type = 'base64') => {
   return cryptString
 }
 
-const randomInt = async (size = 6) => {
+const randomPasscode = async (size = 6) => {
   const cryptString = await new Promise(async (resolve, reject) => {
     try {
-      crypto.randomInt(0, 1000000, (err, n) => {
+      randomInt(0, 1000000, (err, n) => {
         if (err) throw err;
         const verificationCode = n.toString().padStart(size, "0");
         return resolve(verificationCode);
@@ -92,6 +92,6 @@ module.exports = {
   hashPassword,
   randomString,
   parseToken,
-  randomInt,
+  randomPasscode,
   validator
 };

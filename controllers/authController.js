@@ -2,7 +2,7 @@ const db = require('../database/mysql');
 const User = db.users;
 const AuthUser = db.auth;
 const { createUser, getUser, updateUser, isExist, savePasscode, deleteCodes } = require('../services/query/index');
-const { hashPassword, parseToken, randomInt } = require('../services/utils/index');
+const { hashPassword, parseToken, randomPasscode } = require('../services/utils/index');
 const { emailPasscodeTemplate } = require('../services/mail');
 
 const authController = {};
@@ -108,7 +108,7 @@ authController.forgotPassword = async (req, res, next) => {
   const { email } = req.body;
   try {
     const itIs = await isExist(AuthUser, { email: email });
-    const passcode = await randomInt(6);
+    const passcode = await randomPasscode(6);
 
     if(itIs) {
       await savePasscode(email, passcode);
