@@ -118,7 +118,7 @@ authController.passwordReset = async (req, res, next) => {
 authController.forgotPassword = async (req, res, next) => {
   const { email } = req.body;
   try {
-    const itIs = await isExist(AuthUser, { email: email });
+    const itIs = await isExist(AuthUser, { email: email, email_verified: true });
     const passcode = await randomPasscode();
 
     if(itIs) {
