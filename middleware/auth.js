@@ -34,7 +34,7 @@ middleware.validateRegistration = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const validationRule = {
-      "email": "required|email|regex:/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/",
+      "email": "required|email|regex:/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/|emailExist",
       "password": "required|min:8"
     };
 
@@ -86,5 +86,31 @@ middleware.validateResetPassword = async (req, res, next) => {
     return next(err);
   }
 }
+
+middleware.validateConfirmation = async (req, res, next) => {
+    const { email, code } = req.body;
+    try {
+      const validationRule = {
+        "code": "confirmationExist:"+email,
+      };
+    
+        const object = {
+          code
+        };
+    
+        await validator(object, validationRule, {}, (err, status) => {
+          if (!status) {
+            return res.status(400).json({
+              success: false,
+              errors: err.errors
+            });
+          } else {
+            return next();
+          }
+        });
+    }catch(err) {
+      return next(err);
+    }
+  }
 
 module.exports = middleware;

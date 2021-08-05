@@ -1,16 +1,35 @@
 const { MAGIC_ROUND, access_token_public } = require('../../config/config_key');
 const bcrypt = require('bcrypt');
-const { randomInt, randomBytes } = require('crypto');
 const Boom = require('@hapi/boom');
 const jwt = require('jsonwebtoken');
 const Validator = require('validatorjs');
-const { validPasscode } = require('../../services/query');
+const { validPasscode, validConfirmationcode, isExist } = require('../../services/query');
+const db = require('../../database/mysql');
+const AuthUser = db.auth;
 
 Validator.registerAsync('codeExist', async (value, attribute, req, passes) => {
   if(await validPasscode(attribute, value)) {
       passes();
   }else{
       passes(false, 'The email and code are invalid.');
+  }
+  return;
+});
+
+Validator.registerAsync('confirmationExist', async (value, attribute, req, passes) => {
+  if(await validConfirmationcode(attribute, value)) {
+      passes();
+  }else{
+      passes(false, 'The email and code are invalid.');
+  }
+  return;
+});
+
+Validator.registerAsync('emailExist', async (value, attribute, req, passes) => {
+  if(!await isExist(AuthUser, { email: value, email_verified: true })) {
+      passes();
+  }else{
+      passes(false, 'Email not available.');
   }
   return;
 });

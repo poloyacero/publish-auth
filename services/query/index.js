@@ -1,5 +1,6 @@
 const Boom = require('@hapi/boom');
 const Passcode = require('../../models/passcode');
+const ConfirmationCode = require('../../models/confirmation_code');
 
 const createUser = async (model, details) => {
   const user = await new Promise(async (resolve, reject) => {
@@ -103,12 +104,53 @@ const savePasscode = async (email, passwordCode) => {
   return passcode;
 }
 
+const saveConfirmationcode = async (email, confirmationCode) => {
+  const passcode = await new Promise(async (resolve, reject) => {
+    try {
+      const code = await ConfirmationCode.create({
+        email: email,
+        code: confirmationCode
+      });
+      return resolve(code)
+    }catch(error) {
+      return reject(Boom.internal(
+        error.message,
+        error.data,
+        error.status,
+      ));
+    }
+  });
+  return passcode;
+}
+
 const validPasscode = async (email, passwordCode) => {
   const valid = await new Promise(async (resolve, reject) => {
     try {
       const code = await Passcode.findOne({
         email: email,
         code: passwordCode
+      });
+      if(code != null) {
+        return resolve(true);
+      }
+      return resolve(false);
+    }catch(error) {
+      return reject(Boom.internal(
+        error.message,
+        error.data,
+        error.status,
+      ));
+    }
+  });
+  return valid;
+}
+
+const validConfirmationcode = async (email, confirmationCode) => {
+  const valid = await new Promise(async (resolve, reject) => {
+    try {
+      const code = await ConfirmationCode.findOne({
+        email: email,
+        code: confirmationCode
       });
       if(code != null) {
         return resolve(true);
@@ -143,6 +185,24 @@ const deleteCodes = async (email) => {
   return deleted;
 }
 
+const deleteConfirmationcode = async (email) => {
+  const deleted = await new Promise(async (resolve, reject) => {
+    try {
+      const deleted = await ConfirmationCode.deleteMany({
+        email: email
+      });
+      return resolve(deleted)
+    }catch(error) {
+      return reject(Boom.internal(
+        error.message,
+        error.data,
+        error.status,
+      ));
+    }
+  });
+  return deleted;
+}
+
 module.exports = {
   createUser,
   getUser,
@@ -150,5 +210,8 @@ module.exports = {
   isExist,
   savePasscode,
   validPasscode,
-  deleteCodes
+  deleteCodes,
+  saveConfirmationcode,
+  deleteConfirmationcode,
+  validConfirmationcode
 }

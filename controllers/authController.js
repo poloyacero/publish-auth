@@ -1,20 +1,31 @@
 const db = require('../database/mysql');
 const User = db.users;
 const AuthUser = db.auth;
-const { createUser, getUser, updateUser, isExist, savePasscode, deleteCodes } = require('../services/query/index');
+const { createUser, getUser, updateUser, isExist, savePasscode, deleteCodes, saveConfirmationcode, deleteConfirmationcode } = require('../services/query/index');
 const { hashPassword, parseToken, randomPasscode } = require('../services/utils/index');
-const { emailPasscodeTemplate } = require('../services/mail');
+const { emailPasscodeTemplate, confirmationEmailTemplate } = require('../services/mail');
+const { Boom } = require('@hapi/boom');
 
 const authController = {};
 
 authController.register = async (req, res, next) => {
   const { email, contact_name, password } = req.body;
+  let authUser;
   try {
-    // TODO: check if the email is verified then email is still available if not
-
+    const userExist = await getUser(AuthUser, { email: email })
     const hashedPassword = await hashPassword(password);
-    const user = await createUser(User, { contact_name: contact_name, email: email });
-    const authUser = await createUser(AuthUser, { email: email, password: hashedPassword, u_id: user.id, email_verified: true });
+    if(userExist) {
+      if(!userExist.email_verified) {
+        authUser = await updateUser(AuthUser, { id: userExist.id }, { password: hashedPassword });
+      }
+    }else {
+      const user = await createUser(User, { contact_name: contact_name, email: email });
+      authUser = await createUser(AuthUser, { email: email, password: hashedPassword, u_id: user.id, email_verified: false });
+    }
+
+    const code = await randomPasscode();
+    await saveConfirmationcode(email, code);
+    confirmationEmailTemplate(code, email, contact_name);
 
     return res.status(200).json({
       success: true,
@@ -113,6 +124,41 @@ authController.forgotPassword = async (req, res, next) => {
     if(itIs) {
       await savePasscode(email, passcode);
       emailPasscodeTemplate(passcode, email);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Success"
+    });
+  }catch(err) {
+    return next(err);
+  }
+}
+
+authController.confirmation = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const updated = await updateUser(AuthUser, { email: email }, { email_verified: true });
+    await deleteConfirmationcode(email)
+
+    return res.status(200).json({
+      success: true,
+      message: "Success"
+    });
+  }catch(err) {
+    return next(err);
+  }
+}
+
+authController.resendConfirmation = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const user = await getUser(User, { email: email });
+    const authUser = await getUser(AuthUser, { email: email });
+    if(!authUser.email_verified) {
+      const code = await randomPasscode();
+      await saveConfirmationcode(email, code);
+      confirmationEmailTemplate(code, email, user.contact_name);
     }
 
     return res.status(200).json({
