@@ -22,7 +22,7 @@ const confirmationEmailTemplate = async (code, email, name) => {
                 </p>
                 <br/><br/>
                 <p style="text-align:center;">We love hearing from you!<br/>
-                    Have any questions? Please check <a href="mailto:admin@thepublishing.com">contact us.</a>
+                    Have any questions? Please <a href="mailto:admin@thepublishing.com">contact us.</a>
                 </p>
                 <br/><br/>
                 <p style="text-align:center;">
@@ -65,7 +65,7 @@ const emailPasscodeTemplate = async (code, email) => {
                 </p>
                 <br/><br/>
                 <p style="text-align:center;">We love hearing from you!<br/>
-                    Have any questions? Please check <a href="mailto:admin@thepublishing.com">contact us.</a>
+                    Have any questions? Please <a href="mailto:admin@thepublishing.com">contact us.</a>
                 </p>
                 <br/><br/>
                 <p style="text-align:center;">
