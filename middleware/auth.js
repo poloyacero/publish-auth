@@ -91,7 +91,7 @@ middleware.validateConfirmation = async (req, res, next) => {
     const { email, code } = req.body;
     try {
       const validationRule = {
-        "code": "confirmationExist:"+email,
+        "code": "required|confirmationExist:"+email,
       };
     
         const object = {
